@@ -99,7 +99,7 @@ class UserController extends Controller
 
             // Nếu đăng ký thành công
             if ($response->successful()) {
-                return redirect()->route('login')->with('success', 'Đăng ký thành công, hãy đăng nhập.');
+                return redirect()->route('login.post')->with('success', 'Đăng ký thành công, hãy đăng nhập.');
             }
 
             // Nếu API trả về lỗi (VD: email trùng)
@@ -121,6 +121,6 @@ class UserController extends Controller
     public function logout()
     {
         session()->flush();
-        return redirect()->route('login')->with('success', 'Bạn đã đăng xuất.');
+        return redirect()->route('login.show')->with('success', 'Bạn đã đăng xuất.');
     }
 }
