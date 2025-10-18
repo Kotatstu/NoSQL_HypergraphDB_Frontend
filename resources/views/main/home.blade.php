@@ -3,6 +3,10 @@
 @section('title', 'Trang chủ - TravelGo')
 
 @section('content')
+    <!-- ✅ Thông tin người dùng -->
+    <div class="alert alert-success text-center">
+        Xin chào, <strong>{{ $user['name'] ?? 'Khách' }}</strong>!
+    </div>
     <!-- Banner -->
     <div class="mb-5">
         <img src="{{ asset('images/banner.jpg') }}" class="img-fluid rounded" alt="Banner du lịch">
