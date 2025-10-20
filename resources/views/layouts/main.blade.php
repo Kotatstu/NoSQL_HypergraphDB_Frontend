@@ -103,6 +103,24 @@
                     <li class="nav-item"><a class="nav-link" href="#">Giới thiệu</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
                 </ul>
+                 <!-- Khu vực người dùng -->
+                <ul class="navbar-nav ms-3">
+                    @if(session('loggedIn') && session('user'))
+                        <li class="nav-item d-flex align-items-center text-white me-3">
+                            <span>Xin chào, <strong>{{ session('user')['name'] ?? 'Người dùng' }}</strong></span>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('logout') }}" class="btn btn-light btn-sm">Đăng xuất</a>
+                        </li>
+                    @else
+                        <li class="nav-item me-2">
+                            <a href="{{ route('login') }}" class="btn btn-light btn-sm">Đăng nhập</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('register') }}" class="btn btn-outline-light btn-sm">Đăng ký</a>
+                        </li>
+                    @endif
+                </ul>
             </div>
         </div>
     </nav>
