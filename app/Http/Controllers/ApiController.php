@@ -15,7 +15,7 @@ class ApiController extends Controller
         $data = $response->json();
         
         // Truyền dữ liệu sang view
-        return view('hello', ['data' => $data]);
+        return view('main.hello', ['data' => $data]);
     }
 
     public function add()
@@ -27,6 +27,6 @@ class ApiController extends Controller
         
         $data = $response->json();
         
-        return view('add', ['data' => $data]);
+        return view('main.add', ['data' => $data]);
     }
 }
