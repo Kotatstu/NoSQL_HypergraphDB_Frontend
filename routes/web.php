@@ -25,5 +25,8 @@ Route::post('/register', [UserController::class, 'register'])->name('register.po
 // Trang home
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+// Chi tiết tour
+Route::get('/tours/{id}', [HomeController::class, 'show'])->name('tours.show');
+
 // Đăng xuất
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
