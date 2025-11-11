@@ -39,28 +39,69 @@ class HomeController extends Controller
     public function show($id)
     {
         try {
-            // Gọi API Java ở cổng 8080
-            $response = Http::get("http://localhost:8080/api/tour/{$id}");
-
-            // Kiểm tra trạng thái phản hồi
-            if ($response->failed()) {
+            // Gọi API chi tiết tour
+            $tourRes = Http::get("http://localhost:8080/api/tour/{$id}");
+            if ($tourRes->failed()) {
                 return abort(404, 'Không thể kết nối tới API hoặc tour không tồn tại.');
             }
 
-            // Parse JSON trả về
-            $tour = $response->json();
-
-            // Gộp dữ liệu nhà tổ chức (để tiện cho view)
+            $tour = $tourRes->json();
             $nhaToChuc = $tour['nhaToChuc'] ?? null;
 
-            // Chuẩn bị dữ liệu truyền sang view
+            // Gọi API đánh giá tour
+            $danhGiaRes = Http::get("http://localhost:8080/api/tour/{$id}/danhgia");
+            $danhGiaList = $danhGiaRes->ok() ? $danhGiaRes->json() : [];
+
             return view('main.details', [
                 'tour' => $tour,
                 'nhaToChuc' => $nhaToChuc,
-                'danhGiaList' => [] // tạm để trống vì API hiện chưa có phần đánh giá
+                'danhGiaList' => $danhGiaList
             ]);
         } catch (\Exception $e) {
             return abort(500, 'Lỗi khi gọi API: ' . $e->getMessage());
         }
     }
+
+    // Hàm đặt tour
+    public function datTour(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'khachHangEmail' => 'required|email',
+                'tourId' => 'required|string',
+                'soNguoi' => 'required|integer|min:1',
+                'ngayKhoiHanh' => 'required|date',
+            ]);
+
+            // Chuẩn bị payload đúng theo model DatTour (bỏ id)
+            $payload = [
+                "khachHangEmail" => $validated['khachHangEmail'],
+                "tourId" => $validated['tourId'],
+                "soNguoi" => $validated['soNguoi'],
+                "ngayDat" => now()->toDateString(), // YYYY-MM-DD
+                "ngayKhoiHanh" => $validated['ngayKhoiHanh'],
+                "trangThai" => "Pending"
+            ];
+
+            $response = Http::asJson()->post('http://localhost:8080/api/dattour', [
+                'khachHangEmail' => $request->khachHangEmail,
+                'tourId' => $request->tourId,
+                'soNguoi' => $request->soNguoi,
+                'ngayDat' => now()->toDateString(),
+                'ngayKhoiHanh' => $request->ngayKhoiHanh,
+                'trangThai' => 'Pending',
+            ]);
+
+            if ($response->failed()) {
+                return back()->with('error', 'Không thể đặt tour. Vui lòng thử lại.');
+            }
+
+            $result = $response->json();
+            return redirect()->back()->with('success', $result['message'] ?? 'Đặt tour thành công!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Lỗi khi đặt tour: ' . $e->getMessage());
+        }
+    }
+
+
 }

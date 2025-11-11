@@ -28,5 +28,8 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 // Chi tiết tour
 Route::get('/tours/{id}', [HomeController::class, 'show'])->name('tours.show');
 
+// Đặt tour
+Route::post('/tour/dat', [HomeController::class, 'datTour'])->name('tour.dat');
+
 // Đăng xuất
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
