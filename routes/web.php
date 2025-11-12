@@ -33,3 +33,12 @@ Route::post('/tour/dat', [HomeController::class, 'datTour'])->name('tour.dat');
 
 // Đăng xuất
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+
+// Tour của user
+Route::get('/user/tours', [UserController::class, 'showUserTours'])->name('user.tours');
+
+// Thanh toán
+Route::post('/user/tour/pay/{id}', [UserController::class, 'payTour'])->name('user.tour.pay');
+
+// Hủy tour
+Route::post('/user/tour/{id}/cancel', [UserController::class, 'cancelTour'])->name('user.tour.cancel');

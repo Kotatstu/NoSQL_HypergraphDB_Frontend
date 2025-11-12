@@ -29,12 +29,6 @@
                     <li class="list-group-item"><strong>Điểm đến:</strong> {{ $tour['diemDen'] ?? '---' }}</li>
                     <li class="list-group-item"><strong>Phương tiện:</strong> {{ $tour['phuongTien'] ?? '---' }}</li>
                 </ul>
-
-                <div class="mt-4 text-center">
-                    <button class="btn btn-success btn-lg px-4 py-2" disabled>
-                        <i class="bi bi-ticket-perforated"></i> Đặt vé (sắp có)
-                    </button>
-                </div>
             </div>
         </div>
     </div>

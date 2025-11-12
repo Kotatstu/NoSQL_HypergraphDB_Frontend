@@ -123,4 +123,123 @@ class UserController extends Controller
         session()->flush();
         return redirect()->route('login.show')->with('success', 'Bạn đã đăng xuất.');
     }
+
+    public function showUserTours()
+    {
+        // Kiểm tra đăng nhập
+        if (!session('loggedIn') || !session('user')) {
+            return redirect()->route('login.show')->with('error', 'Vui lòng đăng nhập để xem tour của bạn.');
+        }
+
+        $user = session('user');
+        $email = $user['email'];
+
+        try {
+            $response = Http::get("{$this->apiUrl}/dattour/{$email}");
+
+            if ($response->successful()) {
+                $tours = $response->json();
+                return view('main.tours', compact('tours', 'user'));
+            }
+
+            if ($response->status() === 404) {
+                return view('main.tours', [
+                    'tours' => [],
+                    'user' => $user,
+                    'message' => 'Bạn chưa đặt tour nào.'
+                ]);
+            }
+
+            return view('main.tours', [
+                'tours' => [],
+                'user' => $user,
+                'message' => 'Không thể lấy danh sách tour. Vui lòng thử lại sau.'
+            ]);
+        } catch (\Exception $e) {
+            return view('main.tours', [
+                'tours' => [],
+                'user' => $user,
+                'message' => 'Lỗi hệ thống: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function payTour(Request $request, $id)
+    {
+        if (!session('loggedIn') || !session('user')) {
+            return redirect()->route('login.show')->with('error', 'Vui lòng đăng nhập.');
+        }
+
+        $user = session('user');
+        $email = $user['email'];
+
+        // Nhận phương thức thanh toán từ form modal (ví dụ: MoMo, Card, Cash)
+        $phuongThuc = $request->input('phuongThucThanhToan', 'Cash');
+
+        try {
+            // =====Cập nhật trạng thái tour sang Paid =====
+            $updateResponse = Http::put("{$this->apiUrl}/dattour/{$email}/{$id}/paid");
+
+            if (!$updateResponse->successful()) {
+                $data = $updateResponse->json();
+                $message = $data['message'] ?? 'Không thể cập nhật trạng thái tour.';
+                return redirect()->route('user.tours')->with('error', $message);
+            }
+
+            // =====Gọi API tạo hóa đơn thanh toán =====
+            $payResponse = Http::asJson()->post("{$this->apiUrl}/hoadon/{$email}/{$id}/pay", [
+                'phuongThucThanhToan' => $phuongThuc
+            ]);
+
+            if ($payResponse->successful()) {
+                $data = $payResponse->json();
+                $message = $data['message'] ?? "Thanh toán tour $id thành công.";
+                $method = $data['phuongThucThanhToan'] ?? $phuongThuc;
+                $tongTien = $data['tongTien'] ?? null;
+
+                $successMsg = $message;
+                if ($tongTien !== null) {
+                    $successMsg .= " (Số tiền: " . number_format($tongTien, 0, ',', '.') . "đ, Phương thức: $method)";
+                }
+
+                return redirect()->route('user.tours')->with('success', $successMsg);
+            }
+
+            // Nếu hóa đơn không được tạo thành công
+            $data = $payResponse->json();
+            $message = $data['message'] ?? 'Không thể tạo hóa đơn thanh toán.';
+            return redirect()->route('user.tours')->with('error', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->route('user.tours')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+        }
+    }
+
+
+    public function cancelTour($id)
+    {
+        // Kiểm tra đăng nhập
+        if (!session('loggedIn') || !session('user')) {
+            return redirect()->route('login.show')->with('error', 'Vui lòng đăng nhập.');
+        }
+
+        $user = session('user');
+        $email = $user['email'];
+
+        try {
+            // Gọi API Java để cập nhật trạng thái sang Cancelled
+            $response = Http::put("{$this->apiUrl}/dattour/{$email}/{$id}/cancelled");
+
+            if ($response->successful()) {
+                return redirect()->route('user.tours')->with('success', 'Đã hủy tour thành công!');
+            } else {
+                return redirect()->route('user.tours')->with('error', 'Không thể hủy tour. Vui lòng thử lại.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->route('user.tours')->with('error', 'Lỗi khi hủy tour: ' . $e->getMessage());
+        }
+    }
+
+
+
 }

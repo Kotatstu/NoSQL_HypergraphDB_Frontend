@@ -28,6 +28,11 @@
             letter-spacing: 0.5px;
         }
 
+        .nav-link.active {
+            font-weight: 600;
+            border-bottom: 2px solid #fff;
+        }
+
         /* Footer */
         footer {
             background-color: #212529;
@@ -62,12 +67,30 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ route('home') }}">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Tour</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Giới thiệu</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ route('home') }}">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Tour</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Liên hệ</a>
+                    </li>
+
+                    {{-- Chỉ hiển thị khi người dùng đã đăng nhập --}}
+                    @if(session('loggedIn') && session('user'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('user.tours') }}">
+                                <i class="bi bi-suitcase2-fill me-1"></i> Tour đã đặt
+                            </a>
+                        </li>
+                    @endif
                 </ul>
 
+                {{-- Tài khoản --}}
                 <ul class="navbar-nav ms-3">
                     @if(session('loggedIn') && session('user'))
                         <li class="nav-item d-flex align-items-center text-white me-3">
