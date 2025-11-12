@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -139,6 +140,7 @@ class UserController extends Controller
 
             if ($response->successful()) {
                 $tours = $response->json();
+                
                 return view('main.tours', compact('tours', 'user'));
             }
 
@@ -173,12 +175,21 @@ class UserController extends Controller
         $user = session('user');
         $email = $user['email'];
 
-        // Nhận phương thức thanh toán từ form modal (ví dụ: MoMo, Card, Cash)
+        // Nhận phương thức thanh toán từ form modal
         $phuongThuc = $request->input('phuongThucThanhToan', 'Cash');
 
         try {
-            // =====Cập nhật trạng thái tour sang Paid =====
+            // ===== Debug: Log dữ liệu gửi lên =====
+            //Log::info("Thanh toán tour - user email: $email, datTourId: $id, phương thức: $phuongThuc");
+
+            // ===== Cập nhật trạng thái tour sang Paid =====
             $updateResponse = Http::put("{$this->apiUrl}/dattour/{$email}/{$id}/paid");
+
+            // Debug log
+            // Log::info('Update DatTour Response', [
+            //     'status' => $updateResponse->status(),
+            //     'body' => $updateResponse->body(),
+            // ]);
 
             if (!$updateResponse->successful()) {
                 $data = $updateResponse->json();
@@ -186,10 +197,16 @@ class UserController extends Controller
                 return redirect()->route('user.tours')->with('error', $message);
             }
 
-            // =====Gọi API tạo hóa đơn thanh toán =====
+            // ===== Gọi API tạo hóa đơn thanh toán =====
             $payResponse = Http::asJson()->post("{$this->apiUrl}/hoadon/{$email}/{$id}/pay", [
                 'phuongThucThanhToan' => $phuongThuc
             ]);
+
+            // Debug log phản hồi API
+            // Log::info('Pay Response', [
+            //     'status' => $payResponse->status(),
+            //     'body' => $payResponse->body(),
+            // ]);
 
             if ($payResponse->successful()) {
                 $data = $payResponse->json();
@@ -211,9 +228,11 @@ class UserController extends Controller
             return redirect()->route('user.tours')->with('error', $message);
 
         } catch (\Exception $e) {
+            //Log::error('Lỗi payTour', ['exception' => $e]);
             return redirect()->route('user.tours')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
         }
     }
+
 
 
     public function cancelTour($id)
