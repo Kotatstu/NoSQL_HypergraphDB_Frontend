@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -140,7 +139,6 @@ class UserController extends Controller
 
             if ($response->successful()) {
                 $tours = $response->json();
-                
                 return view('main.tours', compact('tours', 'user'));
             }
 
@@ -175,21 +173,12 @@ class UserController extends Controller
         $user = session('user');
         $email = $user['email'];
 
-        // Nhận phương thức thanh toán từ form modal
+        // Nhận phương thức thanh toán từ form modal (ví dụ: MoMo, Card, Cash)
         $phuongThuc = $request->input('phuongThucThanhToan', 'Cash');
 
         try {
-            // ===== Debug: Log dữ liệu gửi lên =====
-            //Log::info("Thanh toán tour - user email: $email, datTourId: $id, phương thức: $phuongThuc");
-
-            // ===== Cập nhật trạng thái tour sang Paid =====
+            // =====Cập nhật trạng thái tour sang Paid =====
             $updateResponse = Http::put("{$this->apiUrl}/dattour/{$email}/{$id}/paid");
-
-            // Debug log
-            // Log::info('Update DatTour Response', [
-            //     'status' => $updateResponse->status(),
-            //     'body' => $updateResponse->body(),
-            // ]);
 
             if (!$updateResponse->successful()) {
                 $data = $updateResponse->json();
@@ -197,16 +186,10 @@ class UserController extends Controller
                 return redirect()->route('user.tours')->with('error', $message);
             }
 
-            // ===== Gọi API tạo hóa đơn thanh toán =====
+            // =====Gọi API tạo hóa đơn thanh toán =====
             $payResponse = Http::asJson()->post("{$this->apiUrl}/hoadon/{$email}/{$id}/pay", [
                 'phuongThucThanhToan' => $phuongThuc
             ]);
-
-            // Debug log phản hồi API
-            // Log::info('Pay Response', [
-            //     'status' => $payResponse->status(),
-            //     'body' => $payResponse->body(),
-            // ]);
 
             if ($payResponse->successful()) {
                 $data = $payResponse->json();
@@ -228,12 +211,9 @@ class UserController extends Controller
             return redirect()->route('user.tours')->with('error', $message);
 
         } catch (\Exception $e) {
-            //Log::error('Lỗi payTour', ['exception' => $e]);
             return redirect()->route('user.tours')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
         }
     }
-
-
 
     public function cancelTour($id)
     {
@@ -259,6 +239,90 @@ class UserController extends Controller
         }
     }
 
+    // Show user profile informationpublic function showUserProfile()
+    public function showUserProfile()
+    {
+        try {
+            $response = Http::get("http://localhost:8080/api/currentUser");
 
+            if ($response->successful()) {
+                // Chỉ dùng ->json() để nhận array
+                $data = $response->json();
 
+                if (!isset($data['loggedIn']) || !$data['loggedIn']) {
+                    return redirect()->route('login.show')->with('error', 'Vui lòng đăng nhập.');
+                }
+
+                // Lấy thông tin user, chắc chắn là array
+                $userInfo = $data['user'] ?? [];
+
+                return view('main.info', compact('userInfo'));
+            }
+
+            return redirect()->route('login.show')->with('error', 'Không thể lấy thông tin người dùng.');
+        } catch (\Exception $e) {
+            return redirect()->route('login.show')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Hiển thị form chỉnh sửa thông tin cá nhân (main.edit)
+     */
+    public function showUserProfileEdit()
+    {
+        try {
+            $response = Http::get("{$this->apiUrl}/currentUser", [
+                'withCredentials' => true
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                if (!isset($data['loggedIn']) || !$data['loggedIn']) {
+                    return redirect()->route('login.show')->with('error', 'Vui lòng đăng nhập.');
+                }
+
+                $userInfo = $data['user'] ?? [];
+
+                return view('main.edit', compact('userInfo'));
+            }
+
+            return redirect()->route('login.show')->with('error', 'Không thể lấy thông tin người dùng.');
+        } catch (\Exception $e) {
+            return redirect()->route('login.show')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cập nhật thông tin cá nhân
+     */
+    public function updateUserProfile(Request $request)
+    {
+        $request->validate([
+            'name'  => 'required|string|min:3',
+            'email' => 'required|email',
+        ]);
+
+        try {
+            $response = Http::put("{$this->apiUrl}/user/{$request->email}", [
+                'name' => $request->name,
+                'email' => $request->email,
+                // role giữ nguyên, không hiển thị
+            ]);
+
+            if ($response->successful()) {
+                // Cập nhật lại session với dữ liệu mới
+                $user = session('user'); // lấy session cũ
+                $user['name'] = $request->name;
+                $user['email'] = $request->email;
+                session(['user' => $user]); // lưu lại session mới
+
+                return redirect()->route('main.info')->with('success', 'Thông tin cá nhân đã được cập nhật.');
+            }
+
+            return redirect()->route('main.info')->with('error', 'Không thể cập nhật thông tin người dùng.');
+        } catch (\Exception $e) {
+            return redirect()->route('main.info')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+        }
+    }
 }
