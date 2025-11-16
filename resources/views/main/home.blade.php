@@ -45,20 +45,15 @@
     <!-- Search -->
     <div class="container search-box mt-3">
         <form action="" method="GET" class="row g-2">
-            <div class="col-md-4">
-                <input type="text" name="from" class="form-control" placeholder="Điểm khởi hành">
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-11">
                 <input type="text" name="to" class="form-control" placeholder="Điểm đến">
-            </div>
-            <div class="col-md-3">
-                <input type="date" name="date" class="form-control">
             </div>
             <div class="col-md-1 d-grid">
                 <button class="btn btn-primary">Tìm</button>
             </div>
         </form>
     </div>
+
 
     <!-- Danh sách tour -->
     <div class="container mt-5">
@@ -67,7 +62,7 @@
             @forelse($tours as $tour)
                 <div class="col-md-4 mb-4">
                     <div class="card tour-card h-100 shadow-sm">
-                        <img src="{{ $tour['anhDaiDien'] ?? 'https://placehold.co/400x200' }}" 
+                        <img src="{{ $tour['anhDaiDien'] ?? 'images/default.jpg' }}" 
                              class="card-img-top" alt="{{ $tour['tenTour'] }}">
                         <div class="card-body">
                             <h5 class="card-title fw-semibold">{{ $tour['tenTour'] }}</h5>
