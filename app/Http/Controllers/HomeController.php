@@ -103,7 +103,29 @@ class HomeController extends Controller
         }
     }
 
-    
+    public function search(Request $request)
+    {
+        $keyword = $request->input('name');
+
+        // Gọi API tìm kiếm Java
+        $response = Http::get("http://localhost:8080/api/search", [
+            'name' => $keyword
+        ]);
+
+        if (!$response->ok()) {
+            return back()->with('error', 'Không thể kết nối API tìm kiếm.');
+        }
+
+        $result = $response->json();
+
+        // Lấy danh sách tour
+        $tours = $result['data'] ?? [];
+
+        return view('main.home', [
+            'tours' => $tours,
+            'searchKeyword' => $keyword
+        ]);
+    }
 
     
 

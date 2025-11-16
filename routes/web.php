@@ -107,3 +107,6 @@ Route::prefix('admin')->group(function () {
     Route::get('statistical', [AdminController::class, 'showStatistical'])->name('admin.statistical');
 
 });
+
+// Search
+Route::get('/search', [HomeController::class, 'search'])->name('home.search');

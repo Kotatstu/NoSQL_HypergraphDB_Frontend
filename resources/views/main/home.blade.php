@@ -44,9 +44,9 @@
 
     <!-- Search -->
     <div class="container search-box mt-3">
-        <form action="" method="GET" class="row g-2">
+        <form action="{{ route('home.search') }}" method="GET" class="row g-2">
             <div class="col-md-11">
-                <input type="text" name="to" class="form-control" placeholder="Điểm đến">
+                <input type="text" name="name" class="form-control" placeholder="Điểm đến" value="{{ request('name') }}">
             </div>
             <div class="col-md-1 d-grid">
                 <button class="btn btn-primary">Tìm</button>
@@ -54,6 +54,13 @@
         </form>
     </div>
 
+    <!-- Kết quả tìm kiếm -->
+    @if(request('name'))
+        <div class="container mt-4">
+            <h4 class="fw-bold">Kết quả tìm kiếm cho: <span class="text-primary">"{{ request('name') }}"</span></h4>
+            <hr>
+        </div>
+    @endif
 
     <!-- Danh sách tour -->
     <div class="container mt-5">
