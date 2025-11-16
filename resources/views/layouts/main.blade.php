@@ -18,7 +18,6 @@
             color: #333;
         }
 
-        /* Navbar */
         .navbar {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
@@ -33,7 +32,6 @@
             border-bottom: 2px solid #fff;
         }
 
-        /* Footer */
         footer {
             background-color: #212529;
             color: white;
@@ -56,15 +54,13 @@
     @stack('styles')
 </head>
 <body>
-
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">TravelGo</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -80,7 +76,6 @@
                         <a class="nav-link" href="#">Liên hệ</a>
                     </li>
 
-                    {{-- Chỉ hiển thị khi người dùng đã đăng nhập --}}
                     @if(session('loggedIn') && session('user'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('user.tours') }}">
@@ -90,14 +85,36 @@
                     @endif
                 </ul>
 
-                {{-- Tài khoản --}}
-                <ul class="navbar-nav ms-3">
-                    @if(session('loggedIn') && session('user'))
-                        <li class="nav-item d-flex align-items-center text-white me-3">
-                            <span>Xin chào, <strong>{{ session('user')['name'] ?? 'Người dùng' }}</strong></span>
+                <ul class="navbar-nav ms-3 align-items-center">
+                    @php
+                        $user = session('user', null);
+                        $role = $user['role'] ?? null;
+                        $name = $user['name'] ?? 'Người dùng';
+                    @endphp
+
+                    @if($user)
+                        <li class="nav-item text-white me-3">
+                            <span>Xin chào, <strong>{{ $name }}</strong></span>
                         </li>
+
+                        <li class="nav-item me-2">
+                            <a href="{{ route('main.info') }}" class="btn btn-info btn-sm">
+                                <i class="bi bi-person-fill"></i> Thông tin cá nhân
+                            </a>
+                        </li>
+
+                        @if($role === 'admin')
+                            <li class="nav-item me-2">
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-gear-fill"></i> Quản trị
+                                </a>
+                            </li>
+                        @endif
+
                         <li class="nav-item">
-                            <a href="{{ route('logout') }}" class="btn btn-light btn-sm">Đăng xuất</a>
+                            <a href="{{ route('logout') }}" class="btn btn-light btn-sm">
+                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                            </a>
                         </li>
                     @else
                         <li class="nav-item me-2">
@@ -112,12 +129,10 @@
         </div>
     </nav>
 
-    <!-- Nội dung trang -->
     <main class="container" style="margin-top: 90px;">
         @yield('content')
     </main>
 
-    <!-- Footer -->
     <footer>
         <p>© 2025 TravelGo. Tất cả bản quyền được bảo lưu.</p>
     </footer>
