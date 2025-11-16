@@ -13,7 +13,7 @@ class HomeController extends Controller
     {
         // Kiểm tra người dùng đăng nhập
         if (!session('loggedIn')) {
-            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập trước!');
+            return redirect()->route('login.show')->with('error', 'Vui lòng đăng nhập trước!');
         }
 
         $user = session('user');
