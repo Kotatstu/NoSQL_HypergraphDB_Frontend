@@ -87,26 +87,22 @@ Route::prefix('admin')->group(function () {
 
     // ==== Đặt tour ====
     Route::get('dattour', [AdminController::class, 'listDatTour'])->name('admin.dattour');
-    Route::get('dattour/{id}/edit', [AdminController::class, 'editDatTour'])->name('admin.editDatTour');
-    Route::put('dattour/{id}', [AdminController::class, 'updateDatTour'])->name('admin.updateDatTour');
     Route::delete('dattour/{id}', [AdminController::class, 'deleteDatTour'])->name('admin.deleteDatTour');
 
     // ==== Hóa đơn ====
     Route::get('hoadon', [AdminController::class, 'listHoaDon'])->name('admin.hoadon');
-    Route::get('hoadon/{id}/edit', [AdminController::class, 'editHoaDon'])->name('admin.editHoaDon');
-    Route::put('hoadon/{id}', [AdminController::class, 'updateHoaDon'])->name('admin.updateHoaDon');
     Route::delete('hoadon/{id}', [AdminController::class, 'deleteHoaDon'])->name('admin.deleteHoaDon');
 
     // ==== Đánh giá ====
     Route::get('danhgia', [AdminController::class, 'listDanhGia'])->name('admin.danhgia');
-    Route::get('danhgia/{id}/edit', [AdminController::class, 'editDanhGia'])->name('admin.editDanhGia');
-    Route::put('danhgia/{id}', [AdminController::class, 'updateDanhGia'])->name('admin.updateDanhGia');
     Route::delete('danhgia/{id}', [AdminController::class, 'deleteDanhGia'])->name('admin.deleteDanhGia');
 
     // ==== Thống kê ====
     Route::get('statistical', [AdminController::class, 'showStatistical'])->name('admin.statistical');
 
 });
+
+Route::get('/user/payments', [UserController::class, 'payments'])->name('main.cart');
 
 // Search
 Route::get('/search', [HomeController::class, 'search'])->name('home.search');
