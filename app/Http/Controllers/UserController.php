@@ -325,4 +325,13 @@ class UserController extends Controller
             return redirect()->route('main.info')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
         }
     }
+
+    public function payments()
+{
+    $email = session('user.email');
+    $paid = Http::get("http://localhost:8080/api/hoadon/user/$email")->json();
+
+    return view('main.cart', compact( 'paid'));
+}
+
 }

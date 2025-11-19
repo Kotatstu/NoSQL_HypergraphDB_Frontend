@@ -68,8 +68,6 @@
 
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <!-- Link to edit -->
-                                        <a href="{{ route('admin.editDatTour', $item['id']) }}" class="btn btn-sm btn-primary">Sửa</a>
                                         <!-- Form to delete -->
                                         <form action="{{ route('admin.deleteDatTour', $item['id']) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đặt tour này?');">
                                             @csrf

@@ -27,7 +27,6 @@ class AdminController extends Controller
             }
 
             return view('admin.dashboard', compact('users', 'error'));
-
         } catch (\Exception $e) {
             return view('admin.dashboard', [
                 'users' => collect(),
@@ -87,37 +86,6 @@ class AdminController extends Controller
         return $this->fetchAndRender('danhgia', 'admin.danhgia', 'Không thể lấy danh sách đánh giá từ API.');
     }
 
-    public function editDanhGia($id)
-    {
-        $response = Http::get("{$this->apiUrl}/danhgia/{$id}");
-
-        if ($response->successful()) {
-            $danhGia = $response->json();
-            return view('admin.editDanhGia', compact('danhGia'));
-        }
-
-        return redirect()->route('admin.danhgia')->with('error', 'Không tìm thấy đánh giá.');
-    }
-
-    public function updateDanhGia(Request $request, $id)
-    {
-        $data = $request->only(['khachHangEmail', 'tourId', 'diemDanhGia', 'binhLuan', 'ngayDanhGia']);
-
-        try {
-            if ($request->has('ngayDanhGia')) {
-                $data['ngayDanhGia'] = Carbon::parse($request->input('ngayDanhGia'))->toIso8601String();
-            }
-
-            $response = Http::put("{$this->apiUrl}/danhgia/{$id}", $data);
-
-            session()->flash('success', $response->successful() ? 'Đánh giá đã được cập nhật thành công!' : 'Lỗi khi cập nhật đánh giá.');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Lỗi hệ thống: ' . $e->getMessage());
-        }
-
-        return redirect()->route('admin.danhgia');
-    }
-
     public function deleteDanhGia($id)
     {
         try {
@@ -139,49 +107,6 @@ class AdminController extends Controller
         return $this->fetchAndRender('hoadon', 'admin.hoadon', 'Không thể lấy danh sách hóa đơn từ API.');
     }
 
-    public function editHoaDon($id)
-    {
-        try {
-            $response = Http::get("{$this->apiUrl}/hoadon/{$id}");
-
-            if ($response->successful()) {
-                $hoaDon = $response->json();
-                if (isset($hoaDon['id'])) {
-                    return view('admin.editHoaDon', compact('hoaDon'));
-                }
-                return redirect()->route('admin.hoadon')->with('error', 'Không tìm thấy hóa đơn');
-            }
-
-            return redirect()->route('admin.hoadon')->with('error', 'Lỗi khi gọi API để lấy hóa đơn');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.hoadon')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
-        }
-    }
-
-    public function updateHoaDon(Request $request, $id)
-    {
-        $data = $request->only(['datTourId', 'tongTien', 'phuongThucThanhToan', 'trangThaiThanhToan', 'ngayThanhToan']);
-
-        try {
-            if ($request->has('ngayThanhToan')) {
-                $data['ngayThanhToan'] = Carbon::parse($request->input('ngayThanhToan'))->toIso8601String();
-            }
-
-            $response = Http::put("{$this->apiUrl}/hoadon/{$id}", $data);
-
-            if ($response->successful()) {
-                session()->flash('success', 'Hóa đơn đã được cập nhật!');
-                return redirect()->route('admin.hoadon.show', ['id' => $id]);
-            } else {
-                session()->flash('error', 'Lỗi khi cập nhật hóa đơn.');
-            }
-        } catch (\Exception $e) {
-            session()->flash('error', 'Lỗi hệ thống: ' . $e->getMessage());
-        }
-
-        return redirect()->route('admin.hoadon');
-    }
-
     public function deleteHoaDon($id)
     {
         try {
@@ -200,43 +125,6 @@ class AdminController extends Controller
     public function listDatTour()
     {
         return $this->fetchAndRender('dattour', 'admin.dattour', 'Không thể lấy danh sách đặt tour từ API.');
-    }
-
-    public function editDatTour($id)
-    {
-        try {
-            $response = Http::get("{$this->apiUrl}/dattour/{$id}");
-
-            if ($response->successful()) {
-                $datTour = $response->json();
-                return view('admin.editDatTour', compact('datTour'));
-            }
-
-            return redirect()->route('admin.dattour')->with('error', 'Không tìm thấy đặt tour');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.dattour')->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
-        }
-    }
-
-    public function updateDatTour(Request $request, $id)
-    {
-        $data = $request->only(['khachHangEmail', 'tourId', 'soNguoi', 'ngayDat', 'ngayKhoiHanh', 'trangThai']);
-
-        try {
-            if (isset($data['ngayDat'])) {
-                $data['ngayDat'] = Carbon::parse($data['ngayDat'])->format('Y-m-d');
-            }
-            if (isset($data['ngayKhoiHanh'])) {
-                $data['ngayKhoiHanh'] = Carbon::parse($data['ngayKhoiHanh'])->format('Y-m-d');
-            }
-
-            $response = Http::put("{$this->apiUrl}/dattour/{$id}", $data);
-            session()->flash('success', $response->successful() ? 'Đặt tour đã được cập nhật!' : 'Lỗi khi cập nhật đặt tour.');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Lỗi hệ thống: ' . $e->getMessage());
-        }
-
-        return redirect()->route('admin.dattour');
     }
 
     public function deleteDatTour($id)
@@ -408,26 +296,21 @@ class AdminController extends Controller
     public function editTour($id)
     {
         $response = Http::get("{$this->apiUrl}/tours/{$id}");
-
         if ($response->successful()) {
             $tour = $response->json();
             return view('admin.editTour', compact('tour'));
         }
-
         return redirect()->route('admin.tours')->with('error', 'Không tìm thấy tour.');
     }
-
     public function updateTour(Request $request, $id)
     {
         $data = $request->only(['id', 'tenTour', 'gia', 'thoiGian', 'diemKhoiHanh', 'diemDen', 'phuongTien', 'hinhAnh', 'nhaToChucId']);
-
         try {
             $response = Http::put("{$this->apiUrl}/tours/{$id}", $data);
             session()->flash('success', $response->successful() ? 'Tour đã được cập nhật thành công!' : 'Lỗi khi cập nhật tour.');
         } catch (\Exception $e) {
             session()->flash('error', 'Lỗi hệ thống: ' . $e->getMessage());
         }
-
         return redirect()->route('admin.tours');
     }
 

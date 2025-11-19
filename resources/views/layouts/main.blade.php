@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,14 +13,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        body {
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
             font-family: 'Segoe UI', sans-serif;
             background-color: #f8fafc;
             color: #333;
         }
 
         .navbar {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
@@ -32,12 +37,16 @@
             border-bottom: 2px solid #fff;
         }
 
+        main {
+            flex: 1; /* chiếm không gian còn lại, đẩy footer xuống dưới */
+            margin-top: 90px;
+        }
+
         footer {
             background-color: #212529;
             color: white;
             text-align: center;
             padding: 25px 0;
-            margin-top: 60px;
         }
 
         .btn-tour {
@@ -53,6 +62,7 @@
 
     @stack('styles')
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container">
@@ -64,7 +74,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ route('home') }}">Trang chủ</a>
+                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ route('home') }}">Trang
+                            chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Tour</a>
@@ -76,10 +87,15 @@
                         <a class="nav-link" href="#">Liên hệ</a>
                     </li>
 
-                    @if(session('loggedIn') && session('user'))
+                    @if (session('loggedIn') && session('user'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('user.tours') }}">
                                 <i class="bi bi-suitcase2-fill me-1"></i> Tour đã đặt
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fw-bold" href="{{ route('main.cart') }}">
+                                <i class="bi bi-credit-card-fill me-1"></i> Hoá đơn của tôi
                             </a>
                         </li>
                     @endif
@@ -92,7 +108,7 @@
                         $name = $user['name'] ?? 'Người dùng';
                     @endphp
 
-                    @if($user)
+                    @if ($user)
                         <li class="nav-item text-white me-3">
                             <span>Xin chào, <strong>{{ $name }}</strong></span>
                         </li>
@@ -103,7 +119,7 @@
                             </a>
                         </li>
 
-                        @if($role === 'admin')
+                        @if ($role === 'admin')
                             <li class="nav-item me-2">
                                 <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm">
                                     <i class="bi bi-gear-fill"></i> Quản trị
@@ -129,15 +145,18 @@
         </div>
     </nav>
 
-    <main class="container" style="margin-top: 90px;">
+    <main class="container">
         @yield('content')
     </main>
 
     <footer>
-        <p>© 2025 TravelGo. Tất cả bản quyền được bảo lưu.</p>
+        <div class="text-center bg-dark text-white py-3">
+            © 2025 TravelGo. Tất cả bản quyền được bảo lưu.
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
+
 </html>

@@ -27,7 +27,6 @@
                         <th>Phương Thức Thanh Toán</th>
                         <th>Trạng Thái Thanh Toán</th>
                         <th>Chỉnh Sửa</th>
-                        <th>Xóa</th> <!-- Thêm cột Xóa -->
                     </tr>
                 </thead>
                 <tbody>
@@ -45,9 +44,6 @@
                                 @else
                                     <span class="badge bg-danger">Đã hủy</span>
                                 @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.editHoaDon', $hoaDon['id']) }}" class="btn btn-primary">Chỉnh sửa</a>
                             </td>
                             <!-- Thêm nút Xóa -->
                             <td>

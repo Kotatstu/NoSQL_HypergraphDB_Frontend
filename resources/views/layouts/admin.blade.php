@@ -13,10 +13,14 @@
     @stack('styles')
 
     <style>
-        body {
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
             background-color: #ffffff;
             color: #212529;
-            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Navbar */
@@ -33,11 +37,17 @@
             color: #dceeff !important;
         }
 
+        /* Main content */
+        main {
+            flex: 1; /* chiếm không gian còn lại */
+        }
+
         /* Footer */
         footer {
             background-color: #f8f9fa;
             color: #495057;
             border-top: 1px solid #dee2e6;
+            padding: 1rem 0;
         }
 
         footer span {
@@ -84,8 +94,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="text-center mt-5 py-3">
-        © 2025 - Hệ thống đặt tour du lịch  | <span>Laravel Framework</span>
+    <footer class="text-center">
+        © 2025 - Hệ thống đặt tour du lịch | <span>Laravel Framework</span>
     </footer>
 
     <!-- Scripts -->
